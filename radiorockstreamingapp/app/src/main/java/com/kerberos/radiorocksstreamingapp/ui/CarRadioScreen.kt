@@ -343,6 +343,8 @@ private fun StationInfoSection(uiState: RadioUiState) {
         Spacer(modifier = Modifier.height(16.dp))
 
         // Compact station row: small logo + name + slogan
+        // Shows the artist (group) name when a real track is playing,
+        // otherwise falls back to the station name.
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
@@ -359,7 +361,7 @@ private fun StationInfoSection(uiState: RadioUiState) {
             Spacer(modifier = Modifier.width(10.dp))
             Column {
                 Text(
-                    text = uiState.stationName,
+                    text = if (uiState.artist.isNotBlank()) uiState.artist else uiState.stationName,
                     color = Color.White,
                     fontSize = 16.sp,
                     fontWeight = FontWeight.Bold

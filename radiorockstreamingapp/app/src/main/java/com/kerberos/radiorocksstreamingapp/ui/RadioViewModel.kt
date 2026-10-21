@@ -34,6 +34,8 @@ data class RadioUiState(
     val stationName: String = StreamConstants.STATION_NAME,
     val slogan: String = StreamConstants.STATION_SLOGAN,
     val currentTrack: String = TrackTitles.LIVE_PLACEHOLDER,
+    /** Artist (group) name extracted from the current track; empty when placeholder. */
+    val artist: String = "",
     val trackFromSite: Boolean = false,
     val artworkUrl: String? = null,
     val weatherSummary: String? = null,
@@ -70,7 +72,8 @@ class RadioViewModel : ViewModel() {
                 TrackMetadataStore.currentTrack.collect { track ->
                     if (!track.isNullOrBlank()) {
                         android.util.Log.d("RadioViewModel", "STORE collector: track='$track' (updating UI currentTrack)")
-                        _uiState.update { it.copy(currentTrack = track, artworkUrl = null) }
+                        val parsedArtist = if (track == TrackTitles.LIVE_PLACEHOLDER) "" else TrackTitles.parse(track)?.first ?: ""
+                        _uiState.update { it.copy(currentTrack = track, artist = parsedArtist, artworkUrl = null) }
                         if (track == TrackTitles.LIVE_PLACEHOLDER) {
                             // No real song: drop the artwork/lyrics of the previous track.
                             android.util.Log.d("RadioViewModel", "STORE: placeholder title, clearing artwork/lyrics")
@@ -159,8 +162,9 @@ class RadioViewModel : ViewModel() {
                             val cur = _uiState.value.currentTrack
                             if (cur == TrackTitles.LIVE_PLACEHOLDER || cur.isBlank()) {
                                 android.util.Log.d("RadioViewModel", "POLL: showing SITE fallback as UI currentTrack (no LIVE yet)")
+                                val siteArtist = TrackTitles.parse(result.track)?.first ?: ""
                                 _uiState.update {
-                                    it.copy(currentTrack = result.track, trackFromSite = true)
+                                    it.copy(currentTrack = result.track, artist = siteArtist, trackFromSite = true)
                                 }
                             }
                         } else {
