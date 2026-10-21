@@ -1,0 +1,4 @@
+ /**
+     * Returns true when the raw title is a PRO-MO/announcement break --
+     * the server exposes no ad flag, so the station-branded promo entry
+     * ("Radio ROKS - Рок. Тілько рок!", artis
